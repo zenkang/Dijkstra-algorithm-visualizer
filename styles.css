@@ -1,0 +1,485 @@
+/* Dijkstra Algorithm Visualization Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+/* Main Content Layout */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* Panel Styles */
+.left-panel,
+.right-panel {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.left-panel h3,
+.right-panel h3 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* Graph Section */
+.graph-section {
+    margin-bottom: 25px;
+}
+
+#graph-svg {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Controls Section */
+.controls-section {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 15px;
+}
+
+.controls-section h4 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+/* Graph Mode Controls */
+.graph-mode-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.edit-instructions {
+    background: #edf2f7;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4299e1;
+    margin-bottom: 15px;
+}
+
+.edit-instructions p {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.edit-instructions ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #4a5568;
+}
+
+.edit-instructions li {
+    margin-bottom: 5px;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+}
+
+/* Speed Control */
+.speed-control {
+    margin-bottom: 20px;
+}
+
+.speed-control label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+#speed-slider {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+#speed-display {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+/* Node Selection */
+.node-selection {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.node-selection label {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.node-selection select {
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    color: #4a5568;
+}
+
+/* Algorithm State Tables */
+.algorithm-state {
+    margin-bottom: 25px;
+}
+
+.algorithm-state h3 {
+    margin-bottom: 20px;
+}
+
+.state-table {
+    margin-bottom: 20px;
+}
+
+.state-table h4 {
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+/* Algorithm Tables - Styled like the image */
+.algo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.algo-table th {
+    background: #2d3748;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #4a5568;
+}
+
+.algo-table td {
+    background: #e2e8f0;
+    color: #2d3748;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #cbd5e0;
+    transition: all 0.3s ease;
+}
+
+/* Special styling for different table rows */
+#s-table td {
+    background: #e2e8f0;
+}
+
+#d-table td {
+    background: #e2e8f0;
+}
+
+#pi-table td {
+    background: #e2e8f0;
+}
+
+/* Step Info */
+.step-info {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.step-info h4 {
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.step-info p {
+    margin-bottom: 8px;
+    color: #4a5568;
+}
+
+.step-info span {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+/* Code Section */
+.code-section {
+    margin-top: 25px;
+}
+
+.code-container {
+    background: #2d3748;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#python-code {
+    padding: 20px;
+    margin: 0;
+    background: transparent !important;
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.8;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Code Line Highlighting */
+.highlighted-line {
+    background: rgba(255, 255, 0, 0.2) !important;
+    display: block;
+    margin: 0 -20px;
+    padding: 0 20px;
+    border-left: 4px solid #ffd700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+    animation: highlightPulse 0.5s ease-in-out;
+}
+
+@keyframes highlightPulse {
+    0% { 
+        background: rgba(255, 255, 0, 0.3) !important;
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    }
+    100% { 
+        background: rgba(255, 255, 0, 0.2) !important;
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+    }
+}
+
+.execution-info {
+    display: flex;
+    gap: 30px;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.execution-info p {
+    margin: 0;
+}
+
+.execution-info span {
+    font-weight: bold;
+    color: #2d3748;
+}
+
+/* SVG Node Styles */
+.node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.node:hover {
+    filter: brightness(1.1);
+    stroke-width: 3;
+}
+
+.node-group {
+    transition: all 0.3s ease;
+}
+
+.distance-label {
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+}
+
+.weight-label {
+    font-family: 'Segoe UI', sans-serif;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.edge {
+    transition: all 0.3s ease;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    color: white;
+    opacity: 0.8;
+    margin-top: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
+    }
+    
+    header p {
+        font-size: 1em;
+    }
+    
+    .left-panel,
+    .right-panel {
+        padding: 20px;
+    }
+    
+    .controls {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .node-selection {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+    
+    #graph-svg {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .execution-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Scrollbar */
+.code-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.code-container::-webkit-scrollbar-track {
+    background: #1a202c;
+}
+
+.code-container::-webkit-scrollbar-thumb {
+    background: #4a5568;
+    border-radius: 4px;
+}
+
+.code-container::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}

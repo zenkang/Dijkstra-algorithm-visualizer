@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dijkstra's Algorithm Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dijkstra's Algorithm Visualization</h1>
+            <p>Interactive shortest path algorithm with step-by-step execution and algorithm state tracking</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel: Graph and Controls -->
+            <div class="left-panel">
+                <div class="graph-section">
+                    <h3>Graph Visualization</h3>
+                    <svg id="graph-svg" width="600" height="400">
+                        <!-- Graph will be drawn here -->
+                    </svg>
+                </div>
+
+                <div class="controls-section">
+                    <h4>Graph Editing</h4>
+                    <div class="graph-mode-controls">
+                        <button id="edit-mode-btn" class="btn btn-primary">Edit Mode</button>
+                        <button id="view-mode-btn" class="btn btn-secondary">View Mode</button>
+                        <button id="clear-graph-btn" class="btn btn-danger">Clear Graph</button>
+                        <button id="sample-graph-btn" class="btn btn-secondary">Load Sample</button>
+                    </div>
+                    
+                    <div class="edit-instructions" id="edit-instructions" style="display: none;">
+                        <p><strong>Edit Mode Instructions:</strong></p>
+                        <ul>
+                            <li>Click empty space to add a node</li>
+                            <li>Click a node, then click another node to create an edge</li>
+                            <li>Double-click a node to delete it</li>
+                            <li>Drag nodes to reposition them</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>Algorithm Controls</h4>
+                    <div class="controls">
+                        <button id="start-btn" class="btn btn-primary" disabled>Start Algorithm</button>
+                        <button id="next-btn" class="btn btn-secondary" disabled>Next Step</button>
+                        <button id="reset-btn" class="btn btn-danger">Reset</button>
+                        <button id="auto-btn" class="btn btn-secondary" disabled>Auto Run</button>
+                        <button id="pause-btn" class="btn btn-danger" disabled>Pause</button>
+                    </div>
+                    
+                    <div class="speed-control">
+                        <label for="speed-slider">Animation Speed:</label>
+                        <input type="range" id="speed-slider" min="100" max="2000" value="1000" step="100">
+                        <span id="speed-display">1000ms</span>
+                    </div>
+                    
+                    <div class="node-selection">
+                        <label for="start-node">Start Node:</label>
+                        <select id="start-node">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Algorithm State and Code -->
+            <div class="right-panel">
+                <div class="algorithm-state">
+                    <h3>Algorithm State</h3>
+                    
+                    <div class="state-table">
+                        <h4>S (Visited Nodes)</h4>
+                        <table id="s-table" class="algo-table">
+                            <thead>
+                                <tr><th>S (Visited)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>∅</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="state-table">
+                        <h4>d (Distance Values)</h4>
+                        <table id="d-table" class="algo-table">
+                            <thead>
+                                <tr><th>Node</th><th>s</th><th>x</th><th>u</th><th>v</th><th>y</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>d</strong></td><td>0</td><td>∞</td><td>∞</td><td>∞</td><td>∞</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="state-table">
+                        <h4>π (Predecessor Values)</h4>
+                        <table id="pi-table" class="algo-table">
+                            <thead>
+                                <tr><th>Node</th><th>s</th><th>x</th><th>u</th><th>v</th><th>y</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>π</strong></td><td>NIL</td><td>NIL</td><td>NIL</td><td>NIL</td><td>NIL</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="step-info" id="step-info">
+                        <p>Click "Start Algorithm" to begin</p>
+                    </div>
+                </div>
+
+                <div class="code-section">
+                    <h3>Python Code</h3>
+                    <div class="code-container">
+                        <pre><code id="python-code" class="language-python"></code></pre>
+                    </div>
+                    
+                    <div class="execution-info">
+                        <p>Current Step: <span id="current-step">0</span></p>
+                        <p>Total Steps: <span id="total-steps">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Interactive Dijkstra's Algorithm Visualization | Built with HTML5, CSS3, and JavaScript</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        // All-in-one working implementation
+        console.log('Starting Dijkstra App...');
+        
+        // Python code for display
+        const pythonCode = `def dijkstra(G, w, s):
+    # Initialize-Single-Source(G, s)
+    for v in G.V:
+        d[v] = INFINITY
+        pi[v] = NIL
+    d[s] = 0
+    
+    S = set()
+    Q = G.V.copy()
+    
+    while Q:
+        u = EXTRACT-MIN(Q, d)
+        S.add(u)
+        for v in G.Adj[u]:
+            # Relax(u, v, w)
+            if d[v] > d[u] + w(u, v):
+                d[v] = d[u] + w(u, v)
+                pi[v] = u`;
+
+        class WorkingDijkstraApp {
+            constructor() {
+                this.svg = document.getElementById('graph-svg');
+                this.nodes = new Map();
+                this.edges = new Map();
+                this.isEditMode = false;
+                this.selectedNode = null;
+                this.nodeCounter = 0;
+                this.isCreatingEdge = false;
+                this.edgeStartNode = null;
+                this.tempLine = null;
+                
+                // Dijkstra algorithm state
+                this.algorithmRunning = false;
+                this.algorithmSteps = [];
+                this.currentStep = 0;
+                this.distances = new Map();
+                this.predecessors = new Map();
+                this.visited = new Set();
+                this.queue = new Set();
+                this.autoRunInterval = null;
+                
+                this.init();
+            }
+            
+            init() {
+                console.log('Initializing app...');
+                
+                // Set up the SVG
+                this.svg.setAttribute('width', 600);
+                this.svg.setAttribute('height', 400);
+                this.svg.style.background = '#f8fafc';
+                this.svg.style.border = '2px solid #e2e8f0';
+                this.svg.style.borderRadius = '10px';
+                
+                // Display Python code
+                document.getElementById('python-code').textContent = pythonCode;
+                if (window.Prism) {
+                    Prism.highlightElement(document.getElementById('python-code'));
+                }
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                // Load sample graph
+                this.loadSampleGraph();
+                
+                console.log('App initialized successfully');
+            }
+            
+            setupEventListeners() {
+                // Graph editing controls
+                document.getElementById('edit-mode-btn').addEventListener('click', () => this.enableEditMode());
+                document.getElementById('view-mode-btn').addEventListener('click', () => this.disableEditMode());
+                document.getElementById('clear-graph-btn').addEventListener('click', () => this.clearGraph());
+                document.getElementById('sample-graph-btn').addEventListener('click', () => this.loadSampleGraph());
+                
+                // SVG click for adding nodes and edge creation
+                this.svg.addEventListener('click', (e) => {
+                    if (!this.isEditMode) return;
+                    
+                    const rect = this.svg.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Check if clicked on a node
+                    const clickedNode = this.getNodeAtPosition(x, y);
+                    
+                    if (clickedNode) {
+                        this.handleNodeClick(clickedNode);
+                    } else if (e.target === this.svg) {
+                        // Clicked on empty space
+                        if (this.isCreatingEdge) {
+                            this.cancelEdgeCreation();
+                        } else {
+                            this.addNode(x, y);
+                        }
+                    }
+                });
+                
+                // Mouse move for edge creation preview
+                this.svg.addEventListener('mousemove', (e) => {
+                    if (this.isCreatingEdge && this.tempLine) {
+                        const rect = this.svg.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        this.tempLine.setAttribute('x2', x);
+                        this.tempLine.setAttribute('y2', y);
+                    }
+                });
+                
+                // Speed slider
+                document.getElementById('speed-slider').addEventListener('input', (e) => {
+                    document.getElementById('speed-display').textContent = e.target.value + 'ms';
+                });
+                
+                // Algorithm controls
+                document.getElementById('start-btn').addEventListener('click', () => this.startDijkstra());
+                document.getElementById('next-btn').addEventListener('click', () => this.nextStep());
+                document.getElementById('reset-btn').addEventListener('click', () => this.resetAlgorithm());
+                document.getElementById('auto-btn').addEventListener('click', () => this.autoRun());
+                document.getElementById('pause-btn').addEventListener('click', () => this.pauseAutoRun());
+                
+                console.log('Event listeners set up');
+            }
+            
+            enableEditMode() {
+                this.isEditMode = true;
+                this.svg.style.cursor = 'crosshair';
+                document.getElementById('edit-mode-btn').disabled = true;
+                document.getElementById('view-mode-btn').disabled = false;
+                document.getElementById('edit-instructions').style.display = 'block';
+                this.updateStatus('Edit mode enabled - click to add nodes');
+            }
+            
+            disableEditMode() {
+                this.isEditMode = false;
+                this.selectedNode = null;
+                this.svg.style.cursor = 'default';
+                document.getElementById('edit-mode-btn').disabled = false;
+                document.getElementById('view-mode-btn').disabled = true;
+                document.getElementById('edit-instructions').style.display = 'none';
+                
+                // Cancel any ongoing edge creation
+                if (this.isCreatingEdge) {
+                    this.cancelEdgeCreation();
+                }
+                
+                this.updateStatus('View mode enabled');
+            }
+            
+            addNode(x, y) {
+                const nodeId = String.fromCharCode(97 + this.nodeCounter);
+                this.nodeCounter++;
+                
+                this.nodes.set(nodeId, { x, y, id: nodeId });
+                this.renderNode(nodeId);
+                this.updateStartNodeOptions();
+                this.updateStatus(`Added node ${nodeId}`);
+            }
+            
+            renderNode(nodeId) {
+                const node = this.nodes.get(nodeId);
+                
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.id = `node-${nodeId}`;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', 25);
+                circle.setAttribute('fill', '#4299e1');
+                circle.setAttribute('stroke', '#2b6cb0');
+                circle.setAttribute('stroke-width', 2);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y + 5);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', 'white');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('font-size', '16');
+                text.textContent = nodeId;
+                
+                group.appendChild(circle);
+                group.appendChild(text);
+                this.svg.appendChild(group);
+                
+                // Add drag functionality
+                this.setupNodeDrag(group, nodeId);
+            }
+            
+            setupNodeDrag(group, nodeId) {
+                let isDragging = false;
+                let startX, startY;
+                
+                // Double-click to delete node
+                group.addEventListener('dblclick', (e) => {
+                    if (!this.isEditMode) return;
+                    this.deleteNode(nodeId);
+                    e.stopPropagation();
+                });
+                
+                group.addEventListener('mousedown', (e) => {
+                    if (!this.isEditMode) return;
+                    isDragging = true;
+                    const rect = this.svg.getBoundingClientRect();
+                    startX = e.clientX - rect.left - this.nodes.get(nodeId).x;
+                    startY = e.clientY - rect.top - this.nodes.get(nodeId).y;
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                
+                this.svg.addEventListener('mousemove', (e) => {
+                    if (!isDragging || !this.isEditMode) return;
+                    
+                    const rect = this.svg.getBoundingClientRect();
+                    const newX = Math.max(30, Math.min(570, e.clientX - rect.left - startX));
+                    const newY = Math.max(30, Math.min(370, e.clientY - rect.top - startY));
+                    
+                    this.nodes.get(nodeId).x = newX;
+                    this.nodes.get(nodeId).y = newY;
+                    
+                    const circle = group.querySelector('circle');
+                    const text = group.querySelector('text');
+                    circle.setAttribute('cx', newX);
+                    circle.setAttribute('cy', newY);
+                    text.setAttribute('x', newX);
+                    text.setAttribute('y', newY + 5);
+                    
+                    // Update connected edges
+                    this.updateEdgesForNode(nodeId);
+                });
+                
+                this.svg.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            }
+            
+            getNodeAtPosition(x, y) {
+                for (const [nodeId, node] of this.nodes) {
+                    const distance = Math.sqrt(Math.pow(x - node.x, 2) + Math.pow(y - node.y, 2));
+                    if (distance <= 25) { // radius of node
+                        return nodeId;
+                    }
+                }
+                return null;
+            }
+            
+            handleNodeClick(nodeId) {
+                if (this.isCreatingEdge) {
+                    // Complete edge creation
+                    if (this.edgeStartNode && this.edgeStartNode !== nodeId) {
+                        this.createEdge(this.edgeStartNode, nodeId);
+                    }
+                    this.cancelEdgeCreation();
+                } else {
+                    // Start edge creation
+                    this.startEdgeCreation(nodeId);
+                }
+            }
+            
+            startEdgeCreation(nodeId) {
+                this.isCreatingEdge = true;
+                this.edgeStartNode = nodeId;
+                
+                const startNode = this.nodes.get(nodeId);
+                
+                // Create temporary line
+                this.tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                this.tempLine.setAttribute('x1', startNode.x);
+                this.tempLine.setAttribute('y1', startNode.y);
+                this.tempLine.setAttribute('x2', startNode.x);
+                this.tempLine.setAttribute('y2', startNode.y);
+                this.tempLine.setAttribute('stroke', '#ff6b6b');
+                this.tempLine.setAttribute('stroke-width', 2);
+                this.tempLine.setAttribute('stroke-dasharray', '5,5');
+                this.svg.appendChild(this.tempLine);
+                
+                // Highlight start node
+                const startGroup = document.getElementById(`node-${nodeId}`);
+                const startCircle = startGroup.querySelector('circle');
+                startCircle.setAttribute('fill', '#ff6b6b');
+                
+                this.updateStatus(`Creating edge from ${nodeId} - click target node`);
+            }
+            
+            cancelEdgeCreation() {
+                if (this.tempLine) {
+                    this.svg.removeChild(this.tempLine);
+                    this.tempLine = null;
+                }
+                
+                if (this.edgeStartNode) {
+                    // Reset start node color
+                    const startGroup = document.getElementById(`node-${this.edgeStartNode}`);
+                    const startCircle = startGroup.querySelector('circle');
+                    startCircle.setAttribute('fill', '#4299e1');
+                }
+                
+                this.isCreatingEdge = false;
+                this.edgeStartNode = null;
+                this.updateStatus('Edge creation cancelled');
+            }
+            
+            createEdge(fromNode, toNode) {
+                const weight = prompt(`Enter weight for edge ${fromNode} → ${toNode}:`, '1');
+                if (weight === null || weight === '') return;
+                
+                const edgeId = `${fromNode}-${toNode}`;
+                this.edges.set(edgeId, {
+                    from: fromNode,
+                    to: toNode,
+                    weight: parseFloat(weight) || 1
+                });
+                
+                this.renderEdge(edgeId);
+                this.updateStatus(`Created edge ${fromNode} → ${toNode} with weight ${weight}`);
+            }
+            
+            renderEdge(edgeId) {
+                const edge = this.edges.get(edgeId);
+                const fromNode = this.nodes.get(edge.from);
+                const toNode = this.nodes.get(edge.to);
+                
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.id = `edge-${edgeId}`;
+                
+                // Calculate arrow position
+                const dx = toNode.x - fromNode.x;
+                const dy = toNode.y - fromNode.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const unitX = dx / length;
+                const unitY = dy / length;
+                
+                // Adjust start and end points to node edges
+                const startX = fromNode.x + unitX * 25;
+                const startY = fromNode.y + unitY * 25;
+                const endX = toNode.x - unitX * 25;
+                const endY = toNode.y - unitY * 25;
+                
+                // Create line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', startX);
+                line.setAttribute('y1', startY);
+                line.setAttribute('x2', endX);
+                line.setAttribute('y2', endY);
+                line.setAttribute('stroke', '#2d3748');
+                line.setAttribute('stroke-width', 2);
+                line.setAttribute('marker-end', 'url(#arrowhead)');
+                
+                // Create weight label
+                const midX = (startX + endX) / 2;
+                const midY = (startY + endY) / 2;
+                
+                const weightBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                weightBg.setAttribute('cx', midX);
+                weightBg.setAttribute('cy', midY);
+                weightBg.setAttribute('r', 12);
+                weightBg.setAttribute('fill', 'white');
+                weightBg.setAttribute('stroke', '#2d3748');
+                
+                const weightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                weightText.setAttribute('x', midX);
+                weightText.setAttribute('y', midY + 4);
+                weightText.setAttribute('text-anchor', 'middle');
+                weightText.setAttribute('font-size', '12');
+                weightText.setAttribute('fill', '#2d3748');
+                weightText.textContent = edge.weight;
+                
+                group.appendChild(line);
+                group.appendChild(weightBg);
+                group.appendChild(weightText);
+                
+                // Insert before nodes so edges appear behind
+                this.svg.insertBefore(group, this.svg.firstChild);
+                
+                // Add arrow marker if not exists
+                this.ensureArrowMarker();
+            }
+            
+            ensureArrowMarker() {
+                if (document.getElementById('arrowhead')) return;
+                
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.id = 'arrowhead';
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '7');
+                marker.setAttribute('refX', '9');
+                marker.setAttribute('refY', '3.5');
+                marker.setAttribute('orient', 'auto');
+                
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+                polygon.setAttribute('fill', '#2d3748');
+                
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                this.svg.appendChild(defs);
+            }
+            
+            updateEdgesForNode(nodeId) {
+                for (const [edgeId, edge] of this.edges) {
+                    if (edge.from === nodeId || edge.to === nodeId) {
+                        // Remove old edge rendering
+                        const oldEdge = document.getElementById(`edge-${edgeId}`);
+                        if (oldEdge) {
+                            this.svg.removeChild(oldEdge);
+                        }
+                        // Re-render edge
+                        this.renderEdge(edgeId);
+                    }
+                }
+            }
+            
+            deleteNode(nodeId) {
+                if (confirm(`Delete node ${nodeId} and all its edges?`)) {
+                    // Remove connected edges
+                    const edgesToDelete = [];
+                    for (const [edgeId, edge] of this.edges) {
+                        if (edge.from === nodeId || edge.to === nodeId) {
+                            edgesToDelete.push(edgeId);
+                        }
+                    }
+                    
+                    edgesToDelete.forEach(edgeId => {
+                        const edgeElement = document.getElementById(`edge-${edgeId}`);
+                        if (edgeElement) {
+                            this.svg.removeChild(edgeElement);
+                        }
+                        this.edges.delete(edgeId);
+                    });
+                    
+                    // Remove node
+                    const nodeElement = document.getElementById(`node-${nodeId}`);
+                    if (nodeElement) {
+                        this.svg.removeChild(nodeElement);
+                    }
+                    this.nodes.delete(nodeId);
+                    
+                    this.updateStartNodeOptions();
+                    this.updateStatus(`Deleted node ${nodeId} and ${edgesToDelete.length} edges`);
+                }
+            }
+            
+            clearGraph() {
+                if (confirm('Clear the entire graph?')) {
+                    this.svg.innerHTML = '';
+                    this.nodes.clear();
+                    this.edges.clear();
+                    this.nodeCounter = 0;
+                    this.updateStartNodeOptions();
+                    this.updateStatus('Graph cleared');
+                }
+            }
+            
+            loadSampleGraph() {
+                this.clearGraphSilent();
+                
+                const sampleNodes = [
+                    { id: 's', x: 100, y: 200 },
+                    { id: 'x', x: 250, y: 100 },
+                    { id: 'u', x: 400, y: 150 },
+                    { id: 'v', x: 300, y: 300 },
+                    { id: 'y', x: 500, y: 250 }
+                ];
+                
+                sampleNodes.forEach(node => {
+                    this.nodes.set(node.id, node);
+                    this.renderNode(node.id);
+                });
+                
+                // Add sample edges
+                const sampleEdges = [
+                    { from: 's', to: 'x', weight: 5 },
+                    { from: 's', to: 'u', weight: 8 },
+                    { from: 'x', to: 'u', weight: 9 },
+                    { from: 'x', to: 'y', weight: 12 },
+                    { from: 'u', to: 'v', weight: 7 },
+                    { from: 'u', to: 'y', weight: 6 },
+                    { from: 'v', to: 'y', weight: 3 }
+                ];
+                
+                sampleEdges.forEach(edge => {
+                    const edgeId = `${edge.from}-${edge.to}`;
+                    this.edges.set(edgeId, edge);
+                    this.renderEdge(edgeId);
+                });
+                
+                this.nodeCounter = 5;
+                this.updateStartNodeOptions();
+                this.updateStatus('Sample graph loaded with nodes and edges');
+            }
+            
+            clearGraphSilent() {
+                this.svg.innerHTML = '';
+                this.nodes.clear();
+                this.edges.clear();
+                this.nodeCounter = 0;
+                this.isCreatingEdge = false;
+                this.edgeStartNode = null;
+                this.tempLine = null;
+            }
+            
+            updateStartNodeOptions() {
+                const select = document.getElementById('start-node');
+                select.innerHTML = '';
+                
+                for (const [nodeId] of this.nodes) {
+                    const option = document.createElement('option');
+                    option.value = nodeId;
+                    option.textContent = nodeId;
+                    select.appendChild(option);
+                }
+                
+                // Initialize algorithm state for new graph
+                if (this.nodes.size > 0) {
+                    const nodeIds = Array.from(this.nodes.keys());
+                    nodeIds.forEach(nodeId => {
+                        this.distances.set(nodeId, Infinity);
+                        this.predecessors.set(nodeId, null);
+                    });
+                    this.updateTables();
+                }
+                
+                this.updateControlButtons();
+            }
+            
+            // Dijkstra Algorithm Implementation
+            startDijkstra() {
+                const startNode = document.getElementById('start-node').value;
+                if (!startNode || !this.nodes.has(startNode)) {
+                    alert('Please select a valid start node');
+                    return;
+                }
+                
+                this.resetAlgorithm();
+                this.generateDijkstraSteps(startNode);
+                this.updateTables();
+                this.algorithmRunning = true;
+                this.updateControlButtons();
+                this.updateStatus(`Dijkstra algorithm started from node ${startNode}`);
+            }
+            
+            generateDijkstraSteps(startNode) {
+                this.algorithmSteps = [];
+                
+                // Initialize
+                const nodeIds = Array.from(this.nodes.keys());
+                const distances = new Map();
+                const predecessors = new Map();
+                const visited = new Set();
+                const queue = new Set(nodeIds);
+                
+                // Step 1: Initialize distances and predecessors
+                nodeIds.forEach(node => {
+                    distances.set(node, node === startNode ? 0 : Infinity);
+                    predecessors.set(node, null);
+                });
+                
+                this.algorithmSteps.push({
+                    type: 'initialize',
+                    description: `Initialize: d[${startNode}] = 0, all other distances = ∞`,
+                    distances: new Map(distances),
+                    predecessors: new Map(predecessors),
+                    visited: new Set(visited),
+                    queue: new Set(queue),
+                    currentNode: null,
+                    codeHighlight: 1
+                });
+                
+                // Main algorithm loop
+                while (queue.size > 0) {
+                    // Find minimum distance node in queue
+                    let u = null;
+                    let minDist = Infinity;
+                    for (const node of queue) {
+                        if (distances.get(node) < minDist) {
+                            minDist = distances.get(node);
+                            u = node;
+                        }
+                    }
+                    
+                    if (u === null || distances.get(u) === Infinity) break;
+                    
+                    // Remove u from queue and add to visited
+                    queue.delete(u);
+                    visited.add(u);
+                    
+                    this.algorithmSteps.push({
+                        type: 'extract_min',
+                        description: `Extract min: u = ${u} with distance ${distances.get(u)}`,
+                        distances: new Map(distances),
+                        predecessors: new Map(predecessors),
+                        visited: new Set(visited),
+                        queue: new Set(queue),
+                        currentNode: u,
+                        codeHighlight: 2
+                    });
+                    
+                    // Relax edges
+                    const neighbors = this.getNeighbors(u);
+                    for (const neighbor of neighbors) {
+                        const weight = this.getEdgeWeight(u, neighbor);
+                        const alt = distances.get(u) + weight;
+                        
+                        if (alt < distances.get(neighbor)) {
+                            distances.set(neighbor, alt);
+                            predecessors.set(neighbor, u);
+                            
+                            this.algorithmSteps.push({
+                                type: 'relax',
+                                description: `Relax: d[${neighbor}] = min(${distances.get(neighbor) === alt ? '∞' : distances.get(neighbor)}, ${distances.get(u)} + ${weight}) = ${alt}`,
+                                distances: new Map(distances),
+                                predecessors: new Map(predecessors),
+                                visited: new Set(visited),
+                                queue: new Set(queue),
+                                currentNode: u,
+                                relaxedEdge: { from: u, to: neighbor },
+                                codeHighlight: 3
+                            });
+                        }
+                    }
+                }
+                
+                this.algorithmSteps.push({
+                    type: 'complete',
+                    description: 'Algorithm complete!',
+                    distances: new Map(distances),
+                    predecessors: new Map(predecessors),
+                    visited: new Set(visited),
+                    queue: new Set(queue),
+                    currentNode: null,
+                    codeHighlight: 0
+                });
+            }
+            
+            getNeighbors(nodeId) {
+                const neighbors = [];
+                for (const [edgeId, edge] of this.edges) {
+                    if (edge.from === nodeId) {
+                        neighbors.push(edge.to);
+                    }
+                }
+                return neighbors;
+            }
+            
+            getEdgeWeight(from, to) {
+                const edgeId = `${from}-${to}`;
+                return this.edges.get(edgeId)?.weight || Infinity;
+            }
+            
+            nextStep() {
+                if (!this.algorithmRunning || this.currentStep >= this.algorithmSteps.length) return;
+                
+                const step = this.algorithmSteps[this.currentStep];
+                this.applyStep(step);
+                this.currentStep++;
+                
+                document.getElementById('current-step').textContent = this.currentStep;
+                document.getElementById('total-steps').textContent = this.algorithmSteps.length;
+                
+                if (this.currentStep >= this.algorithmSteps.length) {
+                    this.algorithmRunning = false;
+                    this.updateControlButtons();
+                    this.updateStatus('Algorithm completed!');
+                }
+            }
+            
+            applyStep(step) {
+                this.distances = step.distances;
+                this.predecessors = step.predecessors;
+                this.visited = step.visited;
+                this.queue = step.queue;
+                
+                this.updateTables();
+                this.updateGraphVisualization(step);
+                this.updateStatus(step.description);
+                this.highlightCode(step.codeHighlight);
+            }
+            
+            updateTables() {
+                this.updateSTable();
+                this.updateDTable();
+                this.updatePiTable();
+            }
+            
+            updateSTable() {
+                const tbody = document.querySelector('#s-table tbody');
+                tbody.innerHTML = '';
+                
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                
+                if (this.visited.size === 0) {
+                    cell.textContent = '∅';
+                } else {
+                    cell.textContent = `{${Array.from(this.visited).join(', ')}}`;
+                }
+                
+                row.appendChild(cell);
+                tbody.appendChild(row);
+            }
+            
+            updateDTable() {
+                const table = document.getElementById('d-table');
+                const nodeIds = Array.from(this.nodes.keys()).sort();
+                
+                // Update header
+                const thead = table.querySelector('thead tr');
+                thead.innerHTML = '<th>Node</th>';
+                nodeIds.forEach(nodeId => {
+                    const th = document.createElement('th');
+                    th.textContent = nodeId;
+                    thead.appendChild(th);
+                });
+                
+                // Update body
+                const tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                const row = document.createElement('tr');
+                const labelCell = document.createElement('td');
+                labelCell.innerHTML = '<strong>d</strong>';
+                row.appendChild(labelCell);
+                
+                nodeIds.forEach(nodeId => {
+                    const cell = document.createElement('td');
+                    const distance = this.distances.get(nodeId);
+                    cell.textContent = distance === Infinity ? '∞' : distance;
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            }
+            
+            updatePiTable() {
+                const table = document.getElementById('pi-table');
+                const nodeIds = Array.from(this.nodes.keys()).sort();
+                
+                // Update header
+                const thead = table.querySelector('thead tr');
+                thead.innerHTML = '<th>Node</th>';
+                nodeIds.forEach(nodeId => {
+                    const th = document.createElement('th');
+                    th.textContent = nodeId;
+                    thead.appendChild(th);
+                });
+                
+                // Update body
+                const tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                const row = document.createElement('tr');
+                const labelCell = document.createElement('td');
+                labelCell.innerHTML = '<strong>π</strong>';
+                row.appendChild(labelCell);
+                
+                nodeIds.forEach(nodeId => {
+                    const cell = document.createElement('td');
+                    const predecessor = this.predecessors.get(nodeId);
+                    cell.textContent = predecessor || 'NIL';
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            }
+            
+            updateGraphVisualization(step) {
+                // Reset all node colors
+                for (const nodeId of this.nodes.keys()) {
+                    const group = document.getElementById(`node-${nodeId}`);
+                    if (group) {
+                        const circle = group.querySelector('circle');
+                        if (this.visited.has(nodeId)) {
+                            circle.setAttribute('fill', '#48bb78'); // Green for visited
+                        } else if (nodeId === step.currentNode) {
+                            circle.setAttribute('fill', '#ed8936'); // Orange for current
+                        } else {
+                            circle.setAttribute('fill', '#4299e1'); // Blue for unvisited
+                        }
+                    }
+                }
+                
+                // Highlight relaxed edge if applicable
+                if (step.relaxedEdge) {
+                    const edgeId = `${step.relaxedEdge.from}-${step.relaxedEdge.to}`;
+                    const edgeGroup = document.getElementById(`edge-${edgeId}`);
+                    if (edgeGroup) {
+                        const line = edgeGroup.querySelector('line');
+                        line.setAttribute('stroke', '#e53e3e');
+                        line.setAttribute('stroke-width', 3);
+                        
+                        // Reset after delay
+                        setTimeout(() => {
+                            line.setAttribute('stroke', '#2d3748');
+                            line.setAttribute('stroke-width', 2);
+                        }, 1000);
+                    }
+                }
+            }
+            
+            highlightCode(lineNumber) {
+                // This would highlight the corresponding line in the Python code
+                // For now, just update the step info
+                const lines = [
+                    'Algorithm initialization',
+                    'Extract minimum distance node from queue',
+                    'Add node to visited set',
+                    'Relax adjacent edges'
+                ];
+                
+                if (lineNumber > 0 && lineNumber <= lines.length) {
+                    this.updateStatus(`Step ${this.currentStep}: ${lines[lineNumber - 1]}`);
+                }
+            }
+            
+            resetAlgorithm() {
+                this.algorithmRunning = false;
+                this.algorithmSteps = [];
+                this.currentStep = 0;
+                this.distances.clear();
+                this.predecessors.clear();
+                this.visited.clear();
+                this.queue.clear();
+                
+                if (this.autoRunInterval) {
+                    clearInterval(this.autoRunInterval);
+                    this.autoRunInterval = null;
+                }
+                
+                // Reset visual state
+                for (const nodeId of this.nodes.keys()) {
+                    const group = document.getElementById(`node-${nodeId}`);
+                    if (group) {
+                        const circle = group.querySelector('circle');
+                        circle.setAttribute('fill', '#4299e1');
+                    }
+                }
+                
+                // Initialize tables with empty state
+                if (this.nodes.size > 0) {
+                    const nodeIds = Array.from(this.nodes.keys());
+                    nodeIds.forEach(nodeId => {
+                        this.distances.set(nodeId, Infinity);
+                        this.predecessors.set(nodeId, null);
+                    });
+                    this.updateTables();
+                }
+                
+                this.updateControlButtons();
+                document.getElementById('current-step').textContent = '0';
+                document.getElementById('total-steps').textContent = '0';
+                this.updateStatus('Algorithm reset');
+            }
+            
+            autoRun() {
+                if (this.autoRunInterval) return;
+                
+                const speed = parseInt(document.getElementById('speed-slider').value);
+                this.autoRunInterval = setInterval(() => {
+                    if (this.currentStep >= this.algorithmSteps.length) {
+                        this.pauseAutoRun();
+                        return;
+                    }
+                    this.nextStep();
+                }, speed);
+                
+                this.updateControlButtons();
+                this.updateStatus('Auto-running algorithm...');
+            }
+            
+            pauseAutoRun() {
+                if (this.autoRunInterval) {
+                    clearInterval(this.autoRunInterval);
+                    this.autoRunInterval = null;
+                }
+                this.updateControlButtons();
+                this.updateStatus('Auto-run paused');
+            }
+            
+            updateControlButtons() {
+                const hasGraph = this.nodes.size > 0;
+                const isRunning = this.algorithmRunning;
+                const isAutoRunning = this.autoRunInterval !== null;
+                const hasSteps = this.algorithmSteps.length > 0;
+                const canStep = isRunning && this.currentStep < this.algorithmSteps.length;
+                
+                document.getElementById('start-btn').disabled = !hasGraph || isRunning;
+                document.getElementById('next-btn').disabled = !canStep || isAutoRunning;
+                document.getElementById('auto-btn').disabled = !canStep || isAutoRunning;
+                document.getElementById('pause-btn').disabled = !isAutoRunning;
+            }
+            
+            updateStatus(message) {
+                document.getElementById('step-info').innerHTML = `<p>${message}</p>`;
+                console.log(message);
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, starting app...');
+            window.app = new WorkingDijkstraApp();
+        });
+    </script>
+</body>
+</html>
